@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  mongodb_1:
+    image: mongo:6.0.20-rc3-jammy
+    container_name: mongodb_1
+    networks:
+      default:
+      scancans_shared-network:
+        aliases:
+          - 'host.mongodb-1.internal'
+    ports:
+      - 27017:27017
+    volumes:
+      - ./docker/data/mongodb/db1:/data/db
+      - ./docker/config/mongodb/rs_init_auth.sh:/scripts/rs_init_auth.sh
+      - ./docker/config/mongodb/keyfile.txt:/data/keyfile.txt
+    depends_on:
+      - mongodb_2
+      - mongodb_3
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/keyfile.txt", "--bind_ip_all", "--replSet", "dbrs" ]
+    deploy:
+      resources:
+          limits:
+              cpus: "0.5"
+              memory: 512M
+
+  mongodb_2:
+    image: mongo:6.0.20-rc3-jammy
+    container_name: mongodb_2
+    networks:
+      default:
+      scancans_shared-network:
+        aliases:
+          - 'host.mongodb-2.internal'
+    ports:
+      - 27018:27017
+    volumes:
+      - ./docker/data/mongodb/db2:/data/db
+      - ./docker/config/mongodb/keyfile.txt:/data/keyfile.txt
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/keyfile.txt", "--bind_ip_all", "--replSet", "dbrs" ]
+    deploy:
+      resources:
+          limits:
+              cpus: "0.5"
+              memory: 512M
+
+  mongodb_3:
+    image: mongo:6.0.20-rc3-jammy
+    container_name: mongodb_3
+    networks:
+      default:
+      scancans_shared-network:
+        aliases:
+          - 'host.mongodb-3.internal'
+    ports:
+      - 27019:27017
+    volumes:
+      - ./docker/data/mongodb/db3:/data/db
+      - ./docker/config/mongodb/keyfile.txt:/data/keyfile.txt
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/keyfile.txt", "--bind_ip_all", "--replSet", "dbrs" ]
+    deploy:
+      resources:
+          limits:
+              cpus: "0.5"
+              memory: 512M
+
+networks:
+  scancans_shared-network:
+    external: true

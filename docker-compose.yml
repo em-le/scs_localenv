@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  api:
+    build: 
+      context: ./repos/scs_api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - api_node_modules:/app/node_modules
+      - ./repos/scs_api/src:/app/src
+      - ./repos/scs_api/logs:/app/logs:rw
+      - ./repos/scs_api/.env:/app/.env:ro
+      - ./repos/scs_api/ecosystem.config.js:/app/ecosystem.config.js
+    user: fc-user
+    networks:
+      default:
+      scancans_shared-network:
+        aliases:
+          - host.fc-api.docker.internal
+
+volumes:
+  api_node_modules:
+
+networks:
+  scancans_shared-network:
+    external: true

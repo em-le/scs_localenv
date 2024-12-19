@@ -68,6 +68,29 @@ services:
               cpus: "0.5"
               memory: 512M
 
+  redis:
+    build:
+      context: .
+      dockerfile: ./docker/config/redis/Dockerfile
+    container_name: redis
+    restart: always
+    volumes:
+      - ./docker/data:/data
+      - ./docker/config/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - 6379:6379
+    networks:
+      default:
+      scancans_shared-network:
+        aliases:
+          - 'host.redis.internal'
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+      start_period: 5s
+
 networks:
   scancans_shared-network:
     external: true

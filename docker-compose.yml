@@ -1,6 +1,20 @@
 version: '3.9'
 
 services:
+  web:
+    build:
+      context: ./repos/scs_web
+      dockerfile: Dockerfile.dev
+    container_name: scs-web
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./repos/scs_web:/app
+    user: scs-user
+
   api:
     build: 
       context: ./repos/scs_api
@@ -8,12 +22,9 @@ services:
     container_name: scs-api
     restart: always
     ports:
-      - "3000:3000"
+      - "8080:3000"
     volumes:
-      - ./repos/scs_api/src:/app/src
-      - ./repos/scs_api/logs:/app/logs:rw
-      - ./repos/scs_api/.env:/app/.env:ro
-      - ./repos/scs_api/ecosystem.config.js:/app/ecosystem.config.js
+      - ./repos/scs_api:/app
     user: scs-user
     networks:
       default:
